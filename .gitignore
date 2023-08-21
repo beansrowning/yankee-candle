@@ -1,6 +1,10 @@
 # Data Files
 data/*
 
+# Proxy lists
+proxies.txt
+raw_proxy_list.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
