@@ -3,7 +3,7 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-from scrapy import signals
+from scrapy import signals, Request
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -78,6 +78,9 @@ class YankeeDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
+        request.meta["playwright"] = True
+        request.meta["playwright_context"] = request.meta["proxy"]
+
         return None
 
     def process_response(self, request, response, spider):

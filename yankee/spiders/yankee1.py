@@ -34,4 +34,4 @@ class YankeecandleSpider1(Spider):
         next_page = response.css(".a-last a::attr(href)").get()
         if next_page is not None:
             next_page = response.urljoin(next_page)
-            yield Request(next_page, callback=self.parse)
+            yield Request(next_page, meta = {"playwight": True}, callback=self.parse)

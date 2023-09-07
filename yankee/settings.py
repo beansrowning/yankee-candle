@@ -49,15 +49,38 @@ DEFAULT_REQUEST_HEADERS = {
 #    "yankee.middlewares.YankeeSpiderMiddleware": 543,
 #}
 
+DOWNLOAD_HANDLERS = {
+    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+}
+
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    "scrapy.downloadermiddlewares.cookies.CookiesMiddleware": 700,
-    "rotating_proxies.middlewares.RotatingProxyMiddleware": 800,
-    "rotating_proxies.middlewares.BanDetectionMiddleware": 800,
+    "scrapy.downloadermiddlewares.cookies.CookiesMiddleware": 600,
+    "rotating_proxies.middlewares.RotatingProxyMiddleware": 700,
+    "rotating_proxies.middlewares.BanDetectionMiddleware": 750,
+    "yankee.middlewares.YankeeDownloaderMiddleware": 800
 }
 
 ROTATING_PROXY_LIST_PATH = "proxies.txt"
+
+# Dynamically generate persistent playwright contexts based on proxy
+# Root directory where context folders will be generated
+PLAYWRIGHT_CONTEXT_DIR_ROOT = "playwright-contexts/"
+
+with open("proxies.txt", "r") as file:
+    proxies = file.read().split(sep="\n")
+
+PLAYWRIGHT_CONTEXTS = {
+    proxy_name : {
+        "proxy" : {
+            "server" : proxy_name
+        },
+        "user_data_dir": PLAYWRIGHT_CONTEXT_DIR_ROOT + "".join(char for char in proxy_name if char.isalnum())
+    }
+    for proxy_name in proxies
+}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -95,9 +118,10 @@ AUTOTHROTTLE_MAX_DELAY = 60
 # Set settings whose default value is deprecated to a future-proof value
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+
 FEED_EXPORT_ENCODING = "utf-8"
 FEEDS = {
-    "data/%(name)s-amazon-candle.csv": {
+    "data/raw/%(name)s-amazon-candle.csv": {
         "format": "csv",
         "encoding": "utf8"
     }
