@@ -30,8 +30,15 @@ def check_proxies():
             valid_proxies.append(proxy)
             print(proxy)
 
-for _ in range(30):
-    threading.Thread(target=check_proxies).start()
+threads = []
+
+for i in range(30):
+    threads.append(threading.Thread(target=check_proxies))
+    threads[i].start()
+
+# Block until complete
+for thread in threads:
+    thread.join()
 
 # Write out to new "clean" file
 with open("proxies.txt", "w") as f:
